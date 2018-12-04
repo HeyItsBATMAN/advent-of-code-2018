@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs';
 import { performance } from 'perf_hooks';
-const finSplit = readFileSync('./aoc4.txt').toString().split('\n');
+const finSplit = readFileSync('./bigboyaoc4.txt').toString().split('\n');
 console.log('File imported');
 const exSplit = ``.split('\n');
 
@@ -49,7 +49,8 @@ const partOnePerf = (array) => {
 	}
 	array = array.sort((a, b) => a.timestamp - b.timestamp);
 	let guardIndex = 0;
-	array.forEach((obj, index) => {
+	for (let index = 0; index < array.length; index++) {
+		const obj = array[index];
 		if (obj.data.indexOf('begins shift') !== -1) {
 			const hashIndex = obj.data.indexOf('#') + 1;
 			const guard_id = obj.data.substring(hashIndex, obj.data.indexOf(' ', hashIndex));
@@ -81,7 +82,7 @@ const partOnePerf = (array) => {
 				guards[guardIndex].minutes[minute]++;
 			}
 		}
-	});
+	}
 	guards.sort((a, b) => b.total - a.total);
 	return ({ guards: guards, result: { id: guards[0].id, minute: guards[0].minutes.indexOf(Math.max(...guards[0].minutes)) } });
 };
@@ -93,7 +94,7 @@ const partTwo = (array) => {
 };
 
 let time = performance.now();
-const partOneResult = partOne(finSplit);
+const partOneResult = partOnePerf(finSplit);
 console.log('Part 1: ' + ((performance.now() - time) / 1000));
 console.log(parseInt(partOneResult.result.id, 10) * partOneResult.result.minute);
 time = performance.now();
