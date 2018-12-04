@@ -30,13 +30,32 @@ const partOneShort = (arr) => {
 };
 
 // PART TWO:
-const partTwo = (arr) => {
+const partTwoShort = (array) => {
 	const correct = new Set();
-	arr.map(oid => arr.map(id => {
+	array.map(oid => array
+		.map(id => {
 			const m = oid.split('').filter((c, i) => c === id[i]).join('');
-			if (m.length === arr[0].length - 1) correct.add(m);
+			if (m.length === array[0].length - 1) correct.add(m);
 		}));
 	return Array.from(correct).reverse().join('');
+};
+
+const partTwoPerf = (array) => {
+	let correct = '';
+	const arrLen = array.length;
+	for (let i = arrLen - 1; i >= 0; i--) {
+		for (let j = arrLen - 2; j >= 0; j--) {
+			correct = '';
+			for (let x = 0; x < array[j].length; x++) {
+				if (array[i][x] === array[j][x]) {
+					correct += array[i][x];
+				}
+			}
+			if (correct.length === array[0].length - 1) {
+				return correct;
+			}
+		}
+	}
 };
 
 // Make pretty time
@@ -61,7 +80,7 @@ let restime = (time2[0] * 1000000 + time2[1] / 1000) - (time1[0] * 1000000 + tim
 console.log('Part 1: ' + printTime(restime));
 console.log(partOneResult);
 time1 = process.hrtime();
-const partTwoResult = partTwo(finSplit);
+const partTwoResult = partTwoPerf(finSplit);
 time2 = process.hrtime();
 restime = (time2[0] * 1000000 + time2[1] / 1000) - (time1[0] * 1000000 + time1[1] / 1000);
 console.log('Part 2: ' + printTime(restime));
