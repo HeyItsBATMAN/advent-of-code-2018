@@ -1,33 +1,23 @@
 import { readFileSync, existsSync } from 'fs';
 import { basename } from 'path';
 import { performance } from 'perf_hooks';
-const inFile = basename(__filename).split('.')[0];
+const inFile = basename(__filename, '.ts');
 if (!existsSync(`./${inFile}.txt`)) {
 	console.log('File not loaded... Exiting');
 	process.exit(0);
 }
-const finSplit = readFileSync(`./${inFile}.txt`).toString().split('\n').map(sval => parseInt(sval, 10));
+const finSplit = readFileSync(`./${inFile}.txt`).toString().split('\n');
 console.log('File imported');
 const exSplit = ``.split('\n');
 
-// PART ONE:
+// Part one
 const partOne = (array) => {
-	return array.reduce((acc, val) => acc += val);
+	return array;
 };
 
-// PART TWO:
+// Part two
 const partTwo = (array) => {
-	let start = 0;
-	const set = new Set();
-	while (true) {
-		for (let i = 0; i <= array.length - 1; i++) {
-			start += array[i];
-			const prev = set.size;
-			if (prev === set.add(start).size) {
-				return start;
-			}
-		}
-	}
+	return array;
 };
 
 // Make pretty time
@@ -57,3 +47,4 @@ time2 = process.hrtime();
 restime = (time2[0] * 1000000 + time2[1] / 1000) - (time1[0] * 1000000 + time1[1] / 1000);
 console.log('Part 2: ' + printTime(restime));
 console.log(partTwoResult);
+

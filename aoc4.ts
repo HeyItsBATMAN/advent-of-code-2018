@@ -1,6 +1,12 @@
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
+import { basename } from 'path';
 import { performance } from 'perf_hooks';
-const finSplit = readFileSync('./aoc4.txt').toString().split('\n');
+const inFile = basename(__filename).split('.')[0];
+if (!existsSync(`./${inFile}.txt`)) {
+	console.log('File not loaded... Exiting');
+	process.exit(0);
+}
+const finSplit = readFileSync(`./${inFile}.txt`).toString().split('\n');
 console.log('File imported');
 const exSplit = ``.split('\n');
 
@@ -96,6 +102,7 @@ const partTwo = (array) => {
 	return ({ id: array[0].id, minute: array[0].minutes.indexOf(Math.max(...array[0].minutes)) });
 };
 
+// Make pretty time
 const printTime = (time) => {
 	let returnString = '';
 	if (time / 1000 / 1000 > 1) {
@@ -111,7 +118,8 @@ const printTime = (time) => {
 
 // Running and Benchmarking
 let time1 = process.hrtime();
-const partOneResult = partOnePerf(finSplit);
+new Array(1001).fill(0).map(v => partOnePerf([...finSplit]));
+const partOneResult = partOnePerf([...finSplit]);
 let time2 = process.hrtime();
 let restime = (time2[0] * 1000000 + time2[1] / 1000) - (time1[0] * 1000000 + time1[1] / 1000);
 console.log('Part 1: ' + printTime(restime));

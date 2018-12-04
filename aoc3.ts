@@ -1,9 +1,14 @@
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
+import { basename } from 'path';
 import { performance } from 'perf_hooks';
-const finSplit = readFileSync('./aoc3.txt').toString().split('\n');
-const exSplit = `#1 @ 1,3: 4x4
-#2 @ 3,1: 4x4
-#3 @ 5,5: 2x2`.split('\n');
+const inFile = basename(__filename).split('.')[0];
+if (!existsSync(`./${inFile}.txt`)) {
+	console.log('File not loaded... Exiting');
+	process.exit(0);
+}
+const finSplit = readFileSync(`./${inFile}.txt`).toString().split('\n');
+console.log('File imported');
+const exSplit = ``.split('\n');
 
 const partOne = (array) => {
 	const boxes = [];
@@ -118,10 +123,30 @@ const partTwoShort = (obj) => {
 	return correctbox;
 };
 
-let time = performance.now();
-const resultPartOne = partOneShort(finSplit);
-console.log(resultPartOne.count);
-console.log('Part 1: ' + ((performance.now() - time) / 1000));
-time = performance.now();
-console.log(partTwoShort(resultPartOne));
-console.log('Part 2: ' + ((performance.now() - time) / 1000));
+// Make pretty time
+const printTime = (time) => {
+	let returnString = '';
+	if (time / 1000 / 1000 > 1) {
+		time = time / 1000 / 1000;
+		return returnString += time.toString().substr(0, time.toString().indexOf('.') + 2) + 's';
+	}
+	if (time / 1000 > 1) {
+		time = time / 1000;
+		return returnString += time.toString().substr(0, time.toString().indexOf('.') + 2) + 'ms';
+	}
+	return returnString += time.toString().substr(0, time.toString().indexOf('.') + 2) + 'µs';
+};
+
+// Running and Benchmarking
+let time1 = process.hrtime();
+const partOneResult = partOneShort(finSplit);
+let time2 = process.hrtime();
+let restime = (time2[0] * 1000000 + time2[1] / 1000) - (time1[0] * 1000000 + time1[1] / 1000);
+console.log('Part 1: ' + printTime(restime));
+console.log(partOneResult.count);
+time1 = process.hrtime();
+const partTwoResult = partTwoShort(partOneResult);
+time2 = process.hrtime();
+restime = (time2[0] * 1000000 + time2[1] / 1000) - (time1[0] * 1000000 + time1[1] / 1000);
+console.log('Part 2: ' + printTime(restime));
+console.log(partTwoResult);
