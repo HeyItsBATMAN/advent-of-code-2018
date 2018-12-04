@@ -1,42 +1,44 @@
 import { readFileSync } from 'fs';
 import { performance } from 'perf_hooks';
-const finSplit = readFileSync('./bigboyaoc4.txt').toString().split('\n');
+const finSplit = readFileSync('./aoc4.txt').toString().split('\n');
 console.log('File imported');
 const exSplit = ``.split('\n');
 
+// Part one, small
 const partOne = (array) => {
 	const guards = [];
-	array = array
-		.map(line => ({ timestamp: new Date(line.split(']')[0].substr(1)).getTime(), minutes: new Date(line.split(']')[0].substr(1)).getMinutes(), data: line.split(']')[1] }))
-		.sort((a, b) => a.timestamp - b.timestamp);
 	let guardIndex = 0;
-	array.forEach((obj, index) => {
-		if (obj.data.indexOf('begins shift') !== -1) {
-			const guard_id = obj.data.split('#')[1].split(' ')[0];
-			const filter = guards.filter(guard => guard.id === guard_id);
-			if (filter.length > 0) {
-				// Old guard
-				guardIndex = guards.findIndex((v) => v.id === filter[0].id);
-			} else {
-				// New guard
-				guards.push({
-					id: guard_id,
-					total: 0,
-					minutes: new Array(60).fill(0)
-				});
-				guardIndex = guards.length - 1;
+	array.map(line => ({ timestamp: new Date(line.split(']')[0].substr(1)).getTime(), minutes: new Date(line.split(']')[0].substr(1)).getMinutes(), data: line.split(']')[1] }))
+		.sort((a, b) => a.timestamp - b.timestamp)
+		.forEach((obj, index, arr) => {
+			if (obj.data.indexOf('begins shift') !== -1) {
+				const guard_id = obj.data.split('#')[1].split(' ')[0];
+				const filter = guards.filter(guard => guard.id === guard_id);
+				if (filter.length > 0) {
+					// Old guard
+					guardIndex = guards.findIndex((v) => v.id === filter[0].id);
+				} else {
+					// New guard
+					guards.push({
+						id: guard_id,
+						total: 0,
+						minutes: new Array(60).fill(0)
+					});
+					guardIndex = guards.length - 1;
+				}
+			} else if (obj.data.indexOf('wakes up') !== -1) {
+				guards[guardIndex].total += arr[index].timestamp - arr[index - 1].timestamp;
+				for (let minute = arr[index - 1].minutes; minute < arr[index].minutes; minute++) {
+					guards[guardIndex].minutes[minute]++;
+				}
 			}
-		} else if (obj.data.indexOf('wakes up') !== -1) {
-			guards[guardIndex].total += array[index].timestamp - array[index - 1].timestamp;
-			for (let minute = array[index - 1].minutes; minute < array[index].minutes; minute++) {
-				guards[guardIndex].minutes[minute]++;
-			}
-		}
-	});
+		});
+
 	guards.sort((a, b) => b.total - a.total);
 	return ({ guards: guards, result: { id: guards[0].id, minute: guards[0].minutes.indexOf(Math.max(...guards[0].minutes)) } });
 };
 
+// Part one, performance optimized
 const partOnePerf = (array) => {
 	const guards = [];
 	const arrLen = array.length;
@@ -87,17 +89,23 @@ const partOnePerf = (array) => {
 	return ({ guards: guards, result: { id: guards[0].id, minute: guards[0].minutes.indexOf(Math.max(...guards[0].minutes)) } });
 };
 
+// Part two
 const partTwo = (array) => {
 	array.sort((b, a) => a.minutes.reduce((aa, ab) => Math.max(aa, ab)) -
 		b.minutes.reduce((ba, bb) => Math.max(ba, bb)));
 	return ({ id: array[0].id, minute: array[0].minutes.indexOf(Math.max(...array[0].minutes)) });
 };
 
-let time = performance.now();
-const partOneResult = partOnePerf(finSplit);
-console.log('Part 1: ' + ((performance.now() - time) / 1000));
+// Running and Benchmarking
+let time1 = process.hrtime();
+const partOneResult = partOne(finSplit);
+let time2 = process.hrtime();
+let restime = (time2[0] * 1000000 + time2[1] / 1000) - (time1[0] * 1000000 + time1[1] / 1000);
+console.log('Part 1: ' + restime.toString().substr(0, restime.toString().indexOf('.') + 2) + 'µs');
 console.log(parseInt(partOneResult.result.id, 10) * partOneResult.result.minute);
-time = performance.now();
-console.log('Part 2: ' + ((performance.now() - time) / 1000));
+time1 = process.hrtime();
 const partTwoResult = partTwo(partOneResult.guards);
+time2 = process.hrtime();
+restime = (time2[0] * 1000000 + time2[1] / 1000) - (time1[0] * 1000000 + time1[1] / 1000);
+console.log('Part 2: ' + restime.toString().substr(0, restime.toString().indexOf('.') + 2) + 'µs');
 console.log(parseInt(partTwoResult.id, 10) * partTwoResult.minute);
