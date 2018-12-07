@@ -118,7 +118,7 @@ const printTime = (time) => {
 
 // Running and Benchmarking
 let time1 = process.hrtime();
-new Array(1001).fill(0).map(v => partOnePerf([...finSplit]));
+// new Array(1001).fill(0).map(v => partOnePerf([...finSplit]));
 const partOneResult = partOnePerf([...finSplit]);
 let time2 = process.hrtime();
 let restime = (time2[0] * 1000000 + time2[1] / 1000) - (time1[0] * 1000000 + time1[1] / 1000);
