@@ -12,15 +12,10 @@ const exSplit = `2 3 0 3 10 11 12 1 1 0 1 99 2 1 1 2`.split(' ');
 
 // Part one
 const partOne = (array) => {
-	let result = 0;
 	const nodes = [];
-
 	const resolveNode = (index, pine, metadata) => {
 		const header = [parseInt(pine[index], 10), parseInt(pine[index + 1], 10)];
 		const node = {header: [...header], children: [], metadata: []};
-		if (index === 0) {
-			node['isRoot'] = true;
-		}
 		index += 2;
 		while (header[0] > 0) {
 			const res = resolveNode(index, pine, metadata);
@@ -35,42 +30,24 @@ const partOne = (array) => {
 		nodes.push(node);
 		return { index: index, node: node };
 	};
-
 	resolveNode(0, array, nodes);
-	result = nodes.reduce((a, b) => a += b.metadata.reduce((c, d) => c += d, 0), 0);
-
-	return { result: result, array: array, data: nodes };
+	return { result: nodes.reduce((a, b) => a += b.metadata.reduce((c, d) => c += d, 0), 0), data: nodes };
 };
 
 // Part two
 const partTwo = (obj) => {
-	let result = 0;
-	const getChildValue = (child) => {
-		if (child.header[0] === 0) {
-			return child.metadata.reduce((a, b) => a += b, 0);
-		} else {
-			let val = 0;
-			for (let i = 0; i < child.metadata.length; i++) {
-				const newChild = child.children[child.metadata[i] - 1];
-				if (newChild) {
-					val += getChildValue(newChild);
-				}
-			}
-			return val;
-		}
-	};
-	obj.data.filter(node => node['isRoot'] === true).forEach(node => {
+	const loopMeta = (child) => {
 		let val = 0;
-		for (let i = 0; i < node.metadata.length; i++) {
-			const newChild = node.children[node.metadata[i] - 1];
-			if (newChild) {
-				val += getChildValue(newChild);
-			}
+		for (let i = 0; i < child.metadata.length; i++) {
+			const newChild = child.children[child.metadata[i] - 1];
+			val += newChild ? getChildValue(newChild) : 0;
 		}
-		node['value'] = val;
-	});
-	result = obj.data.filter(node => node['isRoot'] === true)[0].value;
-	return { result: result };
+		return val;
+	};
+	const getChildValue = (child) => {
+		return (child.header[0] === 0) ? child.metadata.reduce((a, b) => a += b, 0) : loopMeta(child);
+	};
+	return { result: loopMeta(obj.data[obj.data.length - 1]) };
 };
 
 // Make pretty time
