@@ -2,7 +2,7 @@ import { printTime } from './printtime';
 import { readFileSync, existsSync } from 'fs';
 import { basename } from 'path';
 import { performance } from 'perf_hooks';
-const inFile = basename(__filename, '.ts');
+const inFile = basename(__filename).split('.')[0];
 if (!existsSync(`./${inFile}.txt`)) {
 	console.log('File not loaded... Exiting');
 	process.exit(0);
