@@ -6,31 +6,30 @@ if (!existsSync(`./${inFile}.txt`)) {
 	console.log('File not loaded... Exiting');
 	process.exit(0);
 }
-const finSplit = readFileSync(`./${inFile}.txt`).toString().split(' ');
+const finSplit = readFileSync(`./${inFile}.txt`).toString().split(' ').map(v => parseInt(v, 10));
 console.log('File imported');
 const exSplit = `2 3 0 3 10 11 12 1 1 0 1 99 2 1 1 2`.split(' ');
 
 // Part one
-const partOne = (array) => {
+const partOne = (input) => {
 	const nodes = [];
-	const resolveNode = (index, pine, metadata) => {
-		const header = [parseInt(pine[index], 10), parseInt(pine[index + 1], 10)];
+	const resolveNode = (i, n, m) => {
+		const header = [n[i], n[i + 1]];
 		const node = {header: [...header], children: [], metadata: []};
-		index += 2;
-		while (header[0] > 0) {
-			const res = resolveNode(index, pine, metadata);
-			index = res.index;
+		i += 2;
+		for (let j = 0; j < header[0]; j++) {
+			const res = resolveNode(i, n, m);
+			i = res.index;
 			node.children.push(res.node);
-			header[0]--;
 		}
-		for (let i = 0; i < header[1]; i++) {
-			node.metadata.push(parseInt(pine[index], 10));
-			index++;
+		for (let j = 0; j < header[1]; j++) {
+			node.metadata.push(n[i]);
+			i++;
 		}
 		nodes.push(node);
-		return { index: index, node: node };
+		return { index: i, node: node };
 	};
-	resolveNode(0, array, nodes);
+	resolveNode(0, input, nodes);
 	return { result: nodes.reduce((a, b) => a += b.metadata.reduce((c, d) => c += d, 0), 0), data: nodes };
 };
 
