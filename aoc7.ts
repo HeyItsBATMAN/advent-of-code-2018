@@ -109,6 +109,44 @@ const partTwo = (steps, maxWorkers, offset) => {
 	return { result: result };
 };
 
+const partTwoPerf = (steps, maxWorkers, offset) => {
+	let result = 0;
+	steps.forEach((step, index) => {
+		step['duration'] = 1 + offset + index;
+	});
+	const workers = [];
+	while (steps.filter(v => !v.done).length > 0) {
+		let somethingDone = false;
+		for (let i = 0; i < maxWorkers; i++) {
+			for (let j = 0; j < steps.length; j++) {
+				const step = steps[j];
+				for (let n = 0; n < step.required.length; n++) {
+					const req = step.required[n];
+					for (let m = 0; m < steps.length; m++) {
+						if (steps[m].done && req === steps[m].letter) {
+							step.required.splice(n, 1);
+						}
+					}
+				}
+				if (step.done) continue;
+				if (step.required.length === 0 && workers.length < maxWorkers && workers.indexOf(step.letter) === -1) {
+					workers.push(step.letter);
+				}
+			}
+			steps.filter(step => step.letter === workers[i] && !step.done).forEach(step => {
+				step.duration--;
+				somethingDone = true;
+				if (step.duration === 0) {
+					step.done = true;
+					workers.splice(i, 1);
+				}
+			});
+		}
+		if (somethingDone) result++;
+	}
+	return { result: result };
+};
+
 // Running and Benchmarking
 time1 = process.hrtime();
 const partOneResult = partOne(finSplit);
@@ -117,7 +155,7 @@ restime = (time2[0] * 1000000 + time2[1] / 1000) - (time1[0] * 1000000 + time1[1
 console.log('Part 1:\t' + printTime(restime));
 console.log(partOneResult.result);
 time1 = process.hrtime();
-const partTwoResult = partTwo(partOne(finSplit).data, 5, 60);
+const partTwoResult = partTwoPerf(partOne(finSplit).data, 5, 60);
 time2 = process.hrtime();
 restime = (time2[0] * 1000000 + time2[1] / 1000) - (time1[0] * 1000000 + time1[1] / 1000);
 console.log('Part 2:\t' + printTime(restime));
