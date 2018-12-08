@@ -20,17 +20,7 @@ const partOne = (input) => {
 	while (lastSize !== input.length) {
 		lastSize = input.length;
 		for (let i = input.length - 1; i > 0; i--) {
-			if (input[i] !== undefined) {
-				if (input[i] === input[i].toUpperCase()) {
-					if (input[i].toLowerCase() === input[i - 1]) {
-						input.splice(i - 1, 2);
-					}
-				} else {
-					if (input[i].toUpperCase() === input[i - 1]) {
-						input.splice(i - 1, 2);
-					}
-				}
-			}
+			if (Math.abs(input[i].charCodeAt() - input[i - 1].charCodeAt()) === 32) input.splice(i - 1, 2);
 		}
 	}
 	return { result: input.length };
@@ -38,13 +28,10 @@ const partOne = (input) => {
 
 // Part two
 const partTwo = (input) => {
-	const results = [];
-	const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
-	alphabet.forEach(char => {
+	return 'abcdefghijklmnopqrstuvwxyz'.split('').map(char => {
 		const newInput = input.filter(letter => letter.toLowerCase() !== char);
-		results.push({ letter: char, result: partOne(newInput).result});
-	});
-	return results.sort((a, b) =>  a.result - b.result)[0];
+		return ({ letter: char, result: partOne(newInput).result});
+	}).sort((a, b) =>  a.result - b.result)[0];
 };
 
 // Running and Benchmarking
