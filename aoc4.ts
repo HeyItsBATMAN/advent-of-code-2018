@@ -1,13 +1,17 @@
+import { printTime } from './printtime';
 import { readFileSync, existsSync } from 'fs';
 import { basename } from 'path';
 import { performance } from 'perf_hooks';
-const inFile = basename(__filename).split('.')[0];
+const inFile = basename(__filename, '.ts');
 if (!existsSync(`./${inFile}.txt`)) {
 	console.log('File not loaded... Exiting');
 	process.exit(0);
 }
+let time1 = process.hrtime();
 const finSplit = readFileSync(`./${inFile}.txt`).toString().split('\n');
-console.log('File imported');
+let time2 = process.hrtime();
+let restime = (time2[0] * 1000000 + time2[1] / 1000) - (time1[0] * 1000000 + time1[1] / 1000);
+console.log('Import:\t' + printTime(restime));
 const exSplit = ``.split('\n');
 
 // Part one, small
@@ -102,31 +106,16 @@ const partTwo = (array) => {
 	return ({ id: array[0].id, minute: array[0].minutes.indexOf(Math.max(...array[0].minutes)) });
 };
 
-// Make pretty time
-const printTime = (time) => {
-	let returnString = '';
-	if (time / 1000 / 1000 > 1) {
-		time = time / 1000 / 1000;
-		return returnString += time.toString().substr(0, time.toString().indexOf('.') + 2) + 's';
-	}
-	if (time / 1000 > 1) {
-		time = time / 1000;
-		return returnString += time.toString().substr(0, time.toString().indexOf('.') + 2) + 'ms';
-	}
-	return returnString += time.toString().substr(0, time.toString().indexOf('.') + 2) + 'µs';
-};
-
 // Running and Benchmarking
-let time1 = process.hrtime();
-// new Array(1001).fill(0).map(v => partOnePerf([...finSplit]));
+time1 = process.hrtime();
 const partOneResult = partOnePerf([...finSplit]);
-let time2 = process.hrtime();
-let restime = (time2[0] * 1000000 + time2[1] / 1000) - (time1[0] * 1000000 + time1[1] / 1000);
-console.log('Part 1: ' + printTime(restime));
+time2 = process.hrtime();
+restime = (time2[0] * 1000000 + time2[1] / 1000) - (time1[0] * 1000000 + time1[1] / 1000);
+console.log('Part 1:\t' + printTime(restime));
 console.log(parseInt(partOneResult.result.id, 10) * partOneResult.result.minute);
 time1 = process.hrtime();
 const partTwoResult = partTwo(partOneResult.guards);
 time2 = process.hrtime();
 restime = (time2[0] * 1000000 + time2[1] / 1000) - (time1[0] * 1000000 + time1[1] / 1000);
-console.log('Part 2: ' + printTime(restime));
+console.log('Part 2:\t' + printTime(restime));
 console.log(parseInt(partTwoResult.id, 10) * partTwoResult.minute);
