@@ -26,6 +26,16 @@ const partOne = (input) => {
 	return { result: input.length };
 };
 
+const partOneHeap = (input) => {
+	const stack = [input[0]];
+	for (let i = 1; i < input.length; i++) {
+		const s = stack[stack.length - 1];
+		if (s && Math.abs(input[i].charCodeAt() - s.charCodeAt()) === 32) stack.pop();
+		else stack.push(input[i]);
+	}
+	return { result: stack.length };
+};
+
 // Part two
 const partTwo = (input) => {
 	return 'abcdefghijklmnopqrstuvwxyz'.split('').map(char => {
@@ -34,15 +44,25 @@ const partTwo = (input) => {
 	}).sort((a, b) =>  a.result - b.result)[0];
 };
 
+const partTwoPerf = (input) => {
+	const arr = 'abcdefghijklmnopqrstuvwxyz'.split('');
+	let result = partOneHeap(input.filter(letter => letter.toLowerCase() !== arr[0])).result;
+	for (let i = 1; i < arr.length; i++) {
+		const res = partOneHeap(input.filter(letter => letter.toLowerCase() !== arr[i])).result;
+		if (res < result) result = res;
+	}
+	return { result: result };
+};
+
 // Running and Benchmarking
 time1 = process.hrtime();
-const partOneResult = partOne(finSplit);
+const partOneResult = partOneHeap(finSplit);
 time2 = process.hrtime();
 restime = (time2[0] * 1000000 + time2[1] / 1000) - (time1[0] * 1000000 + time1[1] / 1000);
 console.log('Part 1:\t' + printTime(restime));
 console.log(partOneResult.result);
 time1 = process.hrtime();
-const partTwoResult = partTwo(finSplit);
+const partTwoResult = partTwoPerf(finSplit);
 time2 = process.hrtime();
 restime = (time2[0] * 1000000 + time2[1] / 1000) - (time1[0] * 1000000 + time1[1] / 1000);
 console.log('Part 2:\t' + printTime(restime));
