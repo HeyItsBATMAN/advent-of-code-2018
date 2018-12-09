@@ -3,7 +3,7 @@ import { printTime } from './printtime';
 
 const filelist = [];
 readdirSync('src/').forEach(file => {
-	if (file.substring(0, 3) === 'aoc' && !file.includes('.map') && Number(file.substring(3, file.indexOf('.'))).toString() !== 'NaN') {
+	if (file.substring(0, 3) === 'aoc' && !file.includes('.map') && Number(file.substring(3, file.indexOf('.'))).toString() !== 'NaN' && (file.includes('.ts') || file.includes('.js'))) {
 		filelist.push(file);
 	}
 });
