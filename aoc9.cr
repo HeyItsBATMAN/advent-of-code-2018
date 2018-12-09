@@ -1,5 +1,7 @@
 input = File.new("../aoc9.txt").gets_to_end
 
+Solution.new input
+
 class Solution
   @players : Int32
   @highest : Int32
@@ -7,6 +9,28 @@ class Solution
   def initialize(@input : String)
     @players = @input.split(' ')[0].to_i
     @highest = @input.split(' ')[6].to_i
+    self.run
+  end
+
+  def run
+    time1 = Time.monotonic
+    part1res = self.part1
+    time2 = Time.monotonic
+    puts "Part 1:\t#{part1res} in #{self.printTime(time2 - time1)}"
+    time1 = Time.monotonic
+    part2res = self.part2
+    time2 = Time.monotonic
+    puts "Part 2:\t#{part2res} in #{self.printTime(time2 - time1)}"
+  end
+
+  def printTime(time : Time::Span)
+    if time.seconds > 1
+      return "#{time.seconds}s"
+    elsif time.milliseconds > 1
+      return "#{time.milliseconds}ms"
+    elsif time.microseconds > 1
+      return "#{time.microseconds}µs"
+    end
   end
 
   def part1
@@ -37,15 +61,4 @@ class Solution
       current.push marble
     end
   end
-
-  def self.test
-    puts "Hello"
-  end
 end
-
-solution = Solution.new input
-
-time = Time.monotonic
-puts "Part 1:\t#{solution.part1} in #{(Time.monotonic - time).milliseconds}ms"
-time = Time.monotonic
-puts "Part 2:\t#{solution.part2} in #{(Time.monotonic - time).milliseconds}ms"
