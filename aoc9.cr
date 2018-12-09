@@ -1,4 +1,5 @@
-input = File.new("../aoc9.txt").gets_to_end
+infile = "../aoc#{PROGRAM_NAME.split('.')[PROGRAM_NAME.split('.').size - 2].split("aoc")[1]}.txt"
+input = File.new(infile).gets_to_end
 
 Solution.new input
 
@@ -30,6 +31,8 @@ class Solution
       return "#{time.milliseconds}ms"
     elsif time.microseconds > 1
       return "#{time.microseconds}µs"
+    else
+      return "#{time.nanoseconds}ns"
     end
   end
 
