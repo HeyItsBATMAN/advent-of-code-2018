@@ -16,7 +16,7 @@ const exSplit = `9 players; last marble is worth 25 points`;
 
 // List implementation
 interface Marble {
-	value: Number;
+	value: number;
 	prev?: Marble;
 	next?: Marble;
 }
@@ -37,7 +37,6 @@ const partOne = (input) => {
 	let currentMarble: Marble = {	value: 0 };
 	currentMarble.next = currentMarble;
 	currentMarble.prev = currentMarble;
-
 	const [players, highest] = [parseInt(input.split(' ')[0], 10), parseInt(input.split(' ')[6], 10)];
 	const playerScore = [];
 	let currentPlayer = 1;
@@ -46,9 +45,8 @@ const partOne = (input) => {
 	}
 	for (let m = 1; m <= highest; m++) {
 		if (m % 23 === 0) {
-			playerScore[currentPlayer - 1].score += m;
 			currentMarble = currentMarble.prev.prev.prev.prev.prev.prev;
-			playerScore[currentPlayer - 1].score += currentMarble.prev.value;
+			playerScore[currentPlayer - 1].score += m + currentMarble.prev.value;
 			currentMarble.prev.prev.next = currentMarble;
 			currentMarble.prev = currentMarble.prev.prev;
 		} else {
@@ -61,30 +59,7 @@ const partOne = (input) => {
 
 // Part two
 const partTwo = (input) => {
-	let currentMarble: Marble = {	value: 0 };
-	currentMarble.next = currentMarble;
-	currentMarble.prev = currentMarble;
-
-	const [players, highest] = [parseInt(input.split(' ')[0], 10), parseInt(input.split(' ')[6], 10) * 100];
-	const playerScore = [];
-	let currentPlayer = 1;
-	for (let i = 1; i <= players; i++) {
-		playerScore.push({player: i, score: 0});
-	}
-
-	for (let m = 1; m <= highest; m++) {
-		if (m % 23 === 0) {
-			playerScore[currentPlayer - 1].score += m;
-			currentMarble = currentMarble.prev.prev.prev.prev.prev.prev;
-			playerScore[currentPlayer - 1].score += currentMarble.prev.value;
-			currentMarble.prev.prev.next = currentMarble;
-			currentMarble.prev = currentMarble.prev.prev;
-		} else {
-			currentMarble = List(currentMarble.next, m);
-		}
-		currentPlayer = currentPlayer % players + 1;
-	}
-	return { result: playerScore.sort((b, a) => a.score - b.score)[0] };
+	return partOne(input.replace(input.split(' ')[6], parseInt(input.split(' ')[6], 10) * 100));
 };
 
 // Running and Benchmarking
