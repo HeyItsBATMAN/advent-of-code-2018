@@ -46,31 +46,8 @@ position=<-3,  6> velocity=< 2, -1>`.split('\n');
 
 // Part one
 const partOne = (array) => {
-	const quickCommandMinMax = (arr) => {
-		let minY = arr[0].pos[1], maxY = arr[0].pos[1], minX = arr[0].pos[0], maxX = arr[0].pos[0];
-		for (let i = 1, len = arr.length; i < len; i++) {
-			const y = arr[i].pos[1];
-			minY = (y < minY) ? y : minY;
-			maxY = (y > maxY) ? y : maxY;
-			const x = arr[i].pos[0];
-			minX = (x < minX) ? x : minX;
-			maxX = (x > maxX) ? x : maxX;
-		}
-		return [minX, maxX, minY, maxY];
-	};
-	const commands = [];
-
-	for (let i = 0; i < array.length; i++) {
-		commands.push({
-			pos: array[i].substring(array[i].indexOf('<') + 1, array[i].indexOf('>')).split(',').map(v => parseInt(v, 10)),
-			vel: array[i].substring(array[i].lastIndexOf('<') + 1, array[i].lastIndexOf('>')).split(',').map(v => parseInt(v, 10))
-		});
-	}
-
-	let result;
-
-	const [minPosX, maxPosX, minPosY, maxPosY] = quickCommandMinMax(commands);
-	let [leastX, leastY] = [Math.abs(minPosX - maxPosX) + 1, Math.abs(minPosY - maxPosY) + 1];
+	const pos = [];
+	const vel = [];
 
 	const quickMoveMinMax = (arr) => {
 		let minY = arr[0][1], maxY = arr[0][1], minX = arr[0][0], maxX = arr[0][0];
@@ -85,19 +62,24 @@ const partOne = (array) => {
 		return [minX, maxX, minY, maxY];
 	};
 
+	for (let i = 0; i < array.length; i++) {
+		pos.push(array[i].substring(array[i].indexOf('<') + 1, array[i].indexOf('>')).split(',').map(v => parseInt(v, 10)));
+		vel.push(array[i].substring(array[i].lastIndexOf('<') + 1, array[i].lastIndexOf('>')).split(',').map(v => parseInt(v, 10)));
+	}
+
+	const [minPosX, maxPosX, minPosY, maxPosY] = quickMoveMinMax(pos);
+	let [leastX, leastY] = [Math.abs(minPosX - maxPosX) + 1, Math.abs(minPosY - maxPosY) + 1];
+
 	const doMoves = (time) => {
 		const moves = [];
-		for (let c = 0; c < commands.length; c++) {
-			const moveY = commands[c].pos[1] + commands[c].vel[1] * time;
-			const moveX = commands[c].pos[0] + commands[c].vel[0] * time;
+		for (let c = 0; c < pos.length; c++) {
+			const moveY = pos[c][1] + vel[c][1] * time;
+			const moveX = pos[c][0] + vel[c][0] * time;
 			moves.push([moveX, moveY]);
 		}
-		const get = (dim) => {
-			return moves.map(m => m[dim]);
-		};
 		const [xMin, xMax, yMin, yMax] = quickMoveMinMax(moves);
 		const [xBounds, yBounds] = [Math.abs(xMin - xMax), Math.abs(yMin - yMax)];
-		return {moves: moves, xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax, xBounds: xBounds, yBounds: yBounds};
+		return {xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax, xBounds: xBounds, yBounds: yBounds};
 	};
 
 	for (let time = 0; true; time++) {
@@ -108,21 +90,14 @@ const partOne = (array) => {
 		} else {
 			time--;
 			const finMove = doMoves(time);
-			const newOffX = Math.abs(finMove.xMin);
-			const newOffY = Math.abs(finMove.yMin);
 			const map = new Array(finMove.yBounds + 1).fill(0).map(v => v = new Array(finMove.xBounds + 1).fill(' '));
-			for (let c = 0; c < commands.length; c++) {
-				const moveY = (commands[c].pos[1] - newOffY) + commands[c].vel[1] * time;
-				const moveX = (commands[c].pos[0] - newOffX) + commands[c].vel[0] * time;
-				if (map[moveY] === undefined || map[moveY][moveX] === undefined) continue;
-				map[moveY][moveX] = '█';
+			for (let c = 0; c < pos.length; c++) {
+				map[(pos[c][1] - finMove.yMin) + vel[c][1] * time][(pos[c][0] - finMove.xMin) + vel[c][0] * time] = '█';
 			}
 			map.forEach(row => console.log(row.join('')));
-			result = { time: time, message: 'See above' };
-			break;
+			return { time: time, message: 'See above' };
 		}
 	}
-	return result;
 };
 
 // Part two
