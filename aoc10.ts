@@ -79,7 +79,7 @@ const partOne = (array) => {
 		}
 		const [xMin, xMax, yMin, yMax] = quickMoveMinMax(moves);
 		const [xBounds, yBounds] = [Math.abs(xMin - xMax), Math.abs(yMin - yMax)];
-		return {xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax, xBounds: xBounds, yBounds: yBounds};
+		return { xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax, xBounds: xBounds, yBounds: yBounds };
 	};
 
 	for (let time = 0; true; time++) {
@@ -100,6 +100,78 @@ const partOne = (array) => {
 	}
 };
 
+const partOnePerf = (array) => {
+	// Inspired by https://www.reddit.com/r/adventofcode/comments/a4skra/2018_day_10_solutions/ebhnzoo/
+	// Thanks to /u/VikeStep
+	const stars = [];
+	for (let i = 0; i < array.length; i++) {
+		stars.push([array[i].substring(array[i].indexOf('<') + 1, array[i].indexOf('>')).split(',').map(v => parseInt(v, 10)),
+		array[i].substring(array[i].lastIndexOf('<') + 1, array[i].lastIndexOf('>')).split(',').map(v => parseInt(v, 10))]);
+	}
+
+	const closestPointOfFastestStars = (vals) => {
+		const sorted = vals.sort((a, b) => {
+			const AbsA = a[1][0] + a[1][1];
+			const AbsB = b[1][0] + b[1][1];
+			return ((AbsA - AbsB) > 0) ? -1 : 1;
+		});
+		const [udx, udy, vdx, vdy] = [sorted[sorted.length - 1][0][0] - sorted[0][0][0], sorted[sorted.length - 1][0][1] - sorted[0][0][1], sorted[sorted.length - 1][1][0] - sorted[0][1][1], sorted[sorted.length - 1][1][1] - sorted[0][1][1]];
+		return Math.round((-vdx * udx - vdy * udy) / (vdx * vdx + vdy * vdy));
+	};
+
+	const quickMoveMinMax = (arr) => {
+		let minY = arr[0][1], maxY = arr[0][1], minX = arr[0][0], maxX = arr[0][0];
+		for (let i = 1, len = arr.length; i < len; i++) {
+			const y = arr[i][1];
+			minY = (y < minY) ? y : minY;
+			maxY = (y > maxY) ? y : maxY;
+			const x = arr[i][0];
+			minX = (x < minX) ? x : minX;
+			maxX = (x > maxX) ? x : maxX;
+		}
+		return [minX, maxX, minY, maxY];
+	};
+
+	const doMoves = (t) => {
+		const moves = [];
+		for (let c = 0; c < stars.length; c++) {
+			const moveY = stars[c][0][1] + stars[c][1][1] * t;
+			const moveX = stars[c][0][0] + stars[c][1][0] * t;
+			moves.push([moveX, moveY]);
+		}
+		const [xMin, xMax, yMin, yMax] = quickMoveMinMax(moves);
+		const [xBounds, yBounds] = [Math.abs(xMin - xMax), Math.abs(yMin - yMax)];
+		return { xMin: xMin, xMax: xMax, yMin: yMin, yMax: yMax, xBounds: xBounds, yBounds: yBounds };
+	};
+
+	const getMessage = (t, vals) => {
+		const finMove = doMoves(t);
+		const map = new Array(finMove.yBounds + 1).fill(0).map(v => v = new Array(finMove.xBounds + 1).fill(' '));
+		for (let c = 0; c < stars.length; c++) {
+			map[(stars[c][0][1] - finMove.yMin) + stars[c][1][1] * t][(stars[c][0][0] - finMove.xMin) + stars[c][1][0] * t] = '█';
+		}
+		map.forEach(row => console.log(row.join('')));
+		return { time: t, message: 'See above' };
+	};
+
+	const descend = (t, prev, cur, next) => {
+		prev = prev ? prev : doMoves(t - 1);
+		cur = cur ? cur : doMoves(t);
+		next = next ? cur : doMoves(t + 1);
+		if (prev.xBounds + prev.yBounds < cur.xBounds + cur.yBounds) descend(t - 1, null, prev, cur);
+		if (next.xBounds + next.yBounds < cur.xBounds + cur.yBounds) descend(t + 1, cur, next, null);
+		else {
+			best_time = t;
+			return t;
+		}
+	};
+
+	let best_time = 0;
+	descend(closestPointOfFastestStars(stars), null, null, null);
+
+	return getMessage(best_time, stars);
+};
+
 // Part two
 const partTwo = (input) => {
 	return input.time;
@@ -107,7 +179,7 @@ const partTwo = (input) => {
 
 // Running and Benchmarking
 time1 = process.hrtime();
-const partOneResult = partOne(finSplit);
+const partOneResult = partOnePerf(finSplit);
 time2 = process.hrtime();
 restime = (time2[0] * 1000000 + time2[1] / 1000) - (time1[0] * 1000000 + time1[1] / 1000);
 console.log('Part 1:\t' + printTime(restime));
