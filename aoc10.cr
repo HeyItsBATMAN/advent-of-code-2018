@@ -50,7 +50,7 @@ class Solution
       else
         time -= 1
         minx, maxx, miny, maxy = moves(time)
-        bounds = [(minx - maxx).abs, (miny - maxy).asb]
+        bounds = [(minx - maxx).abs, (miny - maxy).abs]
         map = Array.new(bounds[1] + 1) { |y| Array.new(bounds[0] + 1) { |j| ' ' } }
         Range.new(0, @pos.size, true).each do |index|
           ymove = (@pos[index][1] - miny.abs) + (@vel[index][1] * time)
