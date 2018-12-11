@@ -29,11 +29,8 @@ const highestSumOfGridSize = (coords, gridSize) => {
 	let highest = {	y: 0, x: 0,	sum: 0 };
 	for (let y = 0; y <= coords.length - gridSize; y++) {
 		for (let x = 0; x <= coords[0].length - gridSize; x++) {
-			const rows = {};
 			let sum = 0;
 			for (let gy = 0; gy < gridSize; gy++) {
-				// Bold assumption
-				if (sum < 0) continue;
 				for (let gx = 0; gx < gridSize; gx++) {
 					sum += coords[y + gy][x + gx];
 				}
@@ -79,8 +76,6 @@ const partOne = (serial) => {
 
 	const highest = highestSumOfGridSize(coords, 3);
 
-	printGrid(highest.x, highest.y, 3, coords);
-
 	return { x: highest.x + 1, y: highest.y + 1, sum: highest.sum, coords: coords, serial: serial};
 };
 
@@ -90,10 +85,14 @@ const partTwo = (obj) => {
 	const serial = obj.serial;
 
 	let highest = {x: 0, y: 0, sum: 0, size: 0};
-	for (let i = 1; i < 300; i++) {
+	let timesSmaller = 0;
+	for (let i = 1; i < 300 && timesSmaller < 5; i++) {
 		const newHighest = highestSumOfGridSize(coords, i);
 		if (newHighest.sum > highest.sum) {
+			timesSmaller = 0;
 			highest = {...newHighest, size: i};
+		} else {
+			timesSmaller++;
 		}
 	}
 	highest.x++;
