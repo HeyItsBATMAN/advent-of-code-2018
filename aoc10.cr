@@ -15,10 +15,10 @@ class Solution
     time1 = Time.monotonic
     part1res = self.part1
     time2 = Time.monotonic
-    puts "Day 10:\t#{part1res} in #{self.printTime(time2 - time1)}"
+    puts "Day 10:\t#{part1res} in #{self.print_time(time2 - time1)}"
   end
 
-  def printTime(time : Time::Span)
+  def print_time(time : Time::Span)
     if time.seconds > 1
       return "#{time.seconds}s"
     elsif time.milliseconds > 1
@@ -39,7 +39,7 @@ class Solution
       end
     end
 
-    minx, maxx, miny, maxy = self.minMaxPos(@pos)
+    minx, maxx, miny, maxy = self.min_max_pos(@pos)
     leastx, leasty = [(minx - maxx).abs, (miny - maxy).abs]
     (0..UInt16::MAX).each do |time|
       minx, maxx, miny, maxy = moves(time)
@@ -51,7 +51,7 @@ class Solution
         time -= 1
         minx, maxx, miny, maxy = moves(time)
         bounds = [(minx - maxx).abs, (miny - maxy).abs]
-        map = Array.new(bounds[1] + 1) { |y| Array.new(bounds[0] + 1) { |j| ' ' } }
+        map = Array.new(bounds[1] + 1) { |_| Array.new(bounds[0] + 1) { |_| ' ' } }
         Range.new(0, @pos.size, true).each do |index|
           ymove = (@pos[index][1] - miny.abs) + (@vel[index][1] * time)
           xmove = (@pos[index][0] - minx.abs) + (@vel[index][0] * time)
@@ -63,7 +63,7 @@ class Solution
     end
   end
 
-  def minMaxPos(arr : Array(Array(Int32)))
+  def min_max_pos(arr : Array(Array(Int32)))
     miny, maxy, minx, maxx = [arr[0][1], arr[0][1], arr[0][0], arr[0][0]]
     arr.each do |pos|
       y = pos[1]
@@ -83,6 +83,6 @@ class Solution
       ymove = @pos[index][1] + @vel[index][1] * time
       moves << [xmove, ymove]
     end
-    return self.minMaxPos(moves)
+    return self.min_max_pos(moves)
   end
 end

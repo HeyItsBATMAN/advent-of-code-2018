@@ -12,14 +12,14 @@ class Solution
     time1 = Time.monotonic
     part1res = self.part1
     time2 = Time.monotonic
-    puts "Part 1:\t#{part1res} in #{self.printTime(time2 - time1)}"
+    puts "Part 1:\t#{part1res} in #{self.print_time(time2 - time1)}"
     time1 = Time.monotonic
     part2res = self.part2
     time2 = Time.monotonic
-    puts "Part 2:\t#{part2res} in #{self.printTime(time2 - time1)}"
+    puts "Part 2:\t#{part2res} in #{self.print_time(time2 - time1)}"
   end
 
-  def printTime(time : Time::Span)
+  def print_time(time : Time::Span)
     if time.seconds > 1
       return "#{time.seconds}s"
     elsif time.milliseconds > 1

@@ -12,14 +12,14 @@ class Solution
     time1 = Time.monotonic
     part1res = self.part1
     time2 = Time.monotonic
-    puts "Part 1:\t#{part1res} in #{self.printTime(time2 - time1)}"
+    puts "Part 1:\t#{part1res} in #{self.print_time(time2 - time1)}"
     time1 = Time.monotonic
     part2res = self.part2
     time2 = Time.monotonic
-    puts "Part 2:\t#{part2res} in #{self.printTime(time2 - time1)}"
+    puts "Part 2:\t#{part2res} in #{self.print_time(time2 - time1)}"
   end
 
-  def printTime(time : Time::Span)
+  def print_time(time : Time::Span)
     if time.seconds > 1
       return "#{time.seconds}s"
     elsif time.milliseconds > 1
@@ -32,21 +32,21 @@ class Solution
   end
 
   def part1
-    return @input.reduce { |acc, v| acc += v }
+    return @input.reduce { |acc, v| acc + v }
   end
 
   def part2
     set = ([] of Int32).to_set
-    return repUntilDouble(set, 0)
+    return repeat_until_double(set, 0)
   end
 
-  def repUntilDouble(set : Set(Int32), start : Int32)
+  def repeat_until_double(set : Set(Int32), start : Int32)
     @input.each do |v|
       start += v
       if set.size == set.add(start).size
         return start
       end
     end
-    return repUntilDouble(set, start)
+    return repeat_until_double(set, start)
   end
 end
