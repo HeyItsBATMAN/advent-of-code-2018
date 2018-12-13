@@ -57,9 +57,7 @@ class Solution
 
     def move
       if !@moved
-        if @below == '+'
-          self.intersect
-        end
+        (@below == '+' && self.intersect)
         # move cart
         case @dir
         when Direction::Up    then @y -= 1
@@ -140,33 +138,30 @@ class Solution
     while @carts.size > 1
       # Order top-left to bottom-right
       @carts.each { |cart| cart.moved = false }
-      rows = @carts.map { |cart| cart.y }.sort.to_set
-      rows.each do |row|
+      @carts.map { |cart| cart.y }.sort.to_set.each { |row|
         @carts.dup.reject! { |cart| cart.y != row }.each { |cart|
           if !cart.moved && !cart.crashed
             # move
             cart.move
             cart.below = @coords[cart.y][cart.x]
             cart.turn
-            @carts.each do |cart2|
-              if cart != cart2
-                if cart.y == cart2.y && cart.x == cart2.x
-                  cart.crashed = true
-                  cart2.crashed = true
-                  # Part 1
-                  if intersection["first"]
-                    intersection["x"] = cart.x
-                    intersection["y"] = cart.y
-                    intersection["crash"] = true
-                    intersection["first"] = false
-                  end
-                  @carts.reject! { |oc| oc.crashed }
+            @carts.each { |cart2|
+              if cart.y == cart2.y && cart.x == cart2.x && cart != cart2
+                cart.crashed = true
+                cart2.crashed = true
+                # Part 1
+                if intersection["first"]
+                  intersection["x"] = cart.x
+                  intersection["y"] = cart.y
+                  intersection["crash"] = true
+                  intersection["first"] = false
                 end
+                @carts.reject! { |oc| oc.crashed }
               end
-            end
+            }
           end
         }
-      end
+      }
     end
 
     # Part 2
