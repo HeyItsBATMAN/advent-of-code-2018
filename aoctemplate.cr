@@ -1,10 +1,10 @@
 infile = "../aoc#{PROGRAM_NAME.split("aoc")[1].split('.')[0]}.txt"
-input = File.new(infile).gets_to_end
+input = File.new(infile).gets_to_end.split("\n")
 
 Solution.new input
 
 class Solution
-  def initialize(@input : String)
+  def initialize(@input : Array(String))
     self.run
   end
 
